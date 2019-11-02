@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Post;
 
 class PostControler extends Controller
 {
@@ -13,7 +14,8 @@ class PostControler extends Controller
      */
     public function index()
     {
-        return view('index');
+        $posts= Post:: all();
+        return view('index')->withPosts($posts);
     }
 
     /**
@@ -23,7 +25,7 @@ class PostControler extends Controller
      */
     public function create()
     {
-        //
+        return view('post.create');
     }
 
     /**
@@ -34,7 +36,19 @@ class PostControler extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'title'=> 'required|min:2|max:86',
+            'content'=> 'required|min:2|max:255'
+            
+        ]);
+
+        $post = new Post();
+
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->save();
+
+        return redirect()->route('index');
     }
 
     /**
@@ -45,7 +59,8 @@ class PostControler extends Controller
      */
     public function show($id)
     {
-        //
+        $post = Post::find($id);
+        return view('post.show')->withPost($post);
     }
 
     /**
@@ -56,8 +71,10 @@ class PostControler extends Controller
      */
     public function edit($id)
     {
-        //
+        $post= Post::find($id);
+        return view('post.edit')->withPost($post);
     }
+    
 
     /**
      * Update the specified resource in storage.
@@ -68,7 +85,19 @@ class PostControler extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'title'=> 'required|min:6|max:86',
+            'content'=> 'required|min:25|max:255'
+            
+        ]);
+
+        $post = Post::find($id);
+
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->save();
+
+        return redirect()->route('index');
     }
 
     /**
@@ -79,6 +108,9 @@ class PostControler extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::find($id);
+
+        $post->delete();
+        return redirect()->route('index');
     }
 }
